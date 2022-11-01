@@ -15,7 +15,6 @@
 
         <input type = "submit" value = "Submit">
         </form>
-        <h5>${employee}</h5>
         <a href = "employee.jsp">Back to Menu</a>
     </body>
 </html>

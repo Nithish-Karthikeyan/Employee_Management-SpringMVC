@@ -4,7 +4,6 @@ import com.ideas2it.dao.EmployeeDao;
 import com.ideas2it.model.Employee;
 import com.ideas2it.model.EmployeeProject;
 import org.hibernate.HibernateException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.NoResultException;
@@ -22,7 +21,7 @@ import java.util.List;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private EmployeeDao employeeDaoImpl;
+    private final EmployeeDao employeeDaoImpl;
 
     public EmployeeServiceImpl(EmployeeDao employeeDaoImpl) {
         this.employeeDaoImpl = employeeDaoImpl;

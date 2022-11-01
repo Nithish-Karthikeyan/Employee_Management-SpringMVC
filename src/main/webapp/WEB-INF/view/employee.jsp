@@ -10,10 +10,10 @@
 
     <body>
         <h1>Employee Details</h1><br>
-        <a href = "performAddEmployee.jsp">Add employee</a><br><br>
-        <a href = "performUpdateEmployee.jsp">Update employee</a><br><br>
+        <a href = "${pageContext.request.contextPath}/performAddEmployee">Add employee</a><br><br>
+        <a href = "${pageContext.request.contextPath}/performUpdateEmployee">Update employee</a><br><br>
         <a href = "${pageContext.request.contextPath}/performGetEmployee">Read employee</a><br><br>
-        <a href = "performDeleteEmployee.jsp">Delete employee</a><br><br>
+        <a href = "${pageContext.request.contextPath}/performDeleteEmployee">Delete employee</a><br><br>
         <a href = "index.jsp">Back to Main Menu</a>
     </body>
 </html>

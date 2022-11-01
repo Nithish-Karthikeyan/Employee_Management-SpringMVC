@@ -1,4 +1,4 @@
-package datetimeutils;
+package com.ideas2it.datetimeutils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

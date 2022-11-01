@@ -10,7 +10,11 @@ import java.util.List;
 @Service
 public class EmployeeProjectServiceImpl implements EmployeeProjectService {
 
-    private final EmployeeProjectDao employeeProjectDaoImpl = new EmployeeProjectDaoImpl();
+    private final EmployeeProjectDao employeeProjectDaoImpl;
+
+    public EmployeeProjectServiceImpl (EmployeeProjectDao employeeProjectDaoImpl) {
+        this.employeeProjectDaoImpl = employeeProjectDaoImpl;
+    }
 
     @Override 
     public int addEmployeeProject(EmployeeProject employeeProject) {

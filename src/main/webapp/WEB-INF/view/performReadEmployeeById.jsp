@@ -1,3 +1,4 @@
+<%@ page import="com.ideas2it.model.Employee" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
@@ -10,7 +11,7 @@
         <h3>Enter the Employee Id</h3>
         <form action="readEmployeeById" method="get">
             <label for = "employeeId"></label>
-            <input type = "text" id = "employeeId" name = "employeeId"><br><br>
+            <input type = "text" id = "employeeId" name = "employeeId"/><br><br>
             <input type = "submit" value = "Submit">
         </form>
         <a href = "performGetEmployee.jsp">Back</a><br><br>

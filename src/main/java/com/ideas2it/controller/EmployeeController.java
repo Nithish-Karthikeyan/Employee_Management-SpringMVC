@@ -1,12 +1,14 @@
 package com.ideas2it.controller;
 
 import com.ideas2it.model.Employee;
+import com.ideas2it.datetimeutils.DateTimeUtils;
 import com.ideas2it.service.*;
+
+import jakarta.persistence.NoResultException;
+import org.hibernate.HibernateException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This class gets input from the servlet and pass the employee details
@@ -19,10 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class EmployeeController {
 
-    private EmployeeService employeeServiceImpl;
-
-    public EmployeeController(EmployeeService employeeServiceImpl) {
+    private final EmployeeService employeeServiceImpl;
+    private final LeaveRecordService leaveRecordServiceImpl;
+    private final EmployeeProjectService employeeProjectServiceImpl;
+    public EmployeeController(EmployeeService employeeServiceImpl, LeaveRecordService leaveRecordServiceImpl, EmployeeProjectService employeeProjectServiceImpl) {
         this.employeeServiceImpl = employeeServiceImpl;
+        this.leaveRecordServiceImpl = leaveRecordServiceImpl;
+        this.employeeProjectServiceImpl = employeeProjectServiceImpl;
     }
 
     @RequestMapping(value = "/")
@@ -55,34 +60,30 @@ public class EmployeeController {
         return "performGetEmployee";
     }
 
-/*    private final LeaveRecordService leaveRecordServiceImpl = new LeaveRecordServiceImpl();
-    private final EmployeeProjectService employeeProjectServiceImpl = new EmployeeProjectServiceImpl();
+    @RequestMapping(value = "/performAddEmployee")
+    public String createEmployee(Model model) {
+        model.addAttribute("employee",new Employee());
+        return "performAddEmployee";
 
+    }
 
-    *//**
+    /**
      * Gets the employee details from the employee servlet.
      * This method invokes another method for creating employee id
      * Gets input for employee name, employee Type, dateOfBirth, mobile number
      * email-id, designation
      * Every parameter is validating by validation util class
      * @param employee gets employee object
-     *//*
+     */
     @PostMapping(value = "/addEmployee")
-    public String addEmployee(Employee employee) {
+    public String addEmployee(@ModelAttribute("employee") Employee employee, Model model) {
         String status;
         DateTimeUtils dateTimeUtils = new DateTimeUtils();
-        String employeeId = employeeServiceImpl.createEmployeeId();
-        String name = employee.getEmployeeName();
-        String employeeType = employee.getEmployeeType();
-        String employeeGender = employee.getEmployeeGender();
-        String dateOfBirth = employee.getDateOfBirth();
-        String mobileNumber = employee.getMobileNumber();
-        boolean isValidMobileNumber = employeeServiceImpl.validateMobileNumber(mobileNumber);
-        String emailId = employee.getEmailId();
-        boolean isValidEmailId = employeeServiceImpl.validateEmailId(emailId);
-        String designation = employee.getDesignation();
-        String createdAt = dateTimeUtils.getDate();
-        String modifiedAt = dateTimeUtils.getDate();
+        employee.setEmployeeId(employeeServiceImpl.createEmployeeId());
+        boolean isValidMobileNumber = employeeServiceImpl.validateMobileNumber(employee.getMobileNumber());
+        boolean isValidEmailId = employeeServiceImpl.validateEmailId(employee.getEmailId());
+        employee.setCreatedAt(dateTimeUtils.getDate());
+        employee.setModifiedAt(dateTimeUtils.getDate());
 
         if (isValidEmailId && isValidMobileNumber) {
             status = "Mobile Number and Email ID Already Exists";
@@ -91,16 +92,13 @@ public class EmployeeController {
         } else if(isValidMobileNumber) {
             status = "Mobile Number Already Exists";
         } else {
-            employee = new Employee(employeeId, employeeType,
-                    name, dateOfBirth, employeeGender,
-                    mobileNumber, emailId, designation,
-                    createdAt, modifiedAt);
-            status = employeeServiceImpl.addEmployee(employee);
+            status = "Employee Created with ID:"+employeeServiceImpl.addEmployee(employee);
         }
-        return status;
+        model.addAttribute("status",status);
+        return "performAddEmployee";
     }      
 
-    *//**
+    /**
      * Get the employee details from the employee service
      */
     @GetMapping("/readEmployee")
@@ -109,37 +107,81 @@ public class EmployeeController {
         return "performReadAllEmployees";
     }
 
+    @RequestMapping(value = "/performReadEmployeeById")
+    public String readEmployee() {
+        return "performReadEmployeeById";
+    }
+
     /**
      * Get the employee by using employee ID
      * @param employeeId gets the employeeId from the servlet
-     *//*
-    public Employee getEmployeeById(String employeeId) throws HibernateException, NoResultException {
-        return employeeServiceImpl.getEmployeeById(employeeId);
+     */
+    @GetMapping("/readEmployeeById")
+    public String getEmployeeById(@RequestParam String employeeId, Model model) throws HibernateException, NoResultException {
+        try {
+            model.addAttribute("employee", employeeServiceImpl.getEmployeeById(employeeId));
+        } catch(NoResultException e) {
+            model.addAttribute("employee","Employee Not Found");
+        }
+        return "performReadEmployeeById";
     }
 
-    *//**
+    @RequestMapping(value = "/performUpdateEmployee")
+    public String updateEmployee() {
+        return "performUpdateEmployee";
+    }
+
+    @RequestMapping(value = "/getEmployee")
+    public String getEmployeeForUpdate(@RequestParam String employeeId, Model model) {
+        Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+        if(null != employee) {
+            model.addAttribute("employee",employee);
+        } else {
+            model.addAttribute("status","Employee Not Found");
+        }
+        return "performEmployeeUpdate";
+    }
+
+   /**
      * Request the update employee method in employee service
      * to update the employee
      * @param employee Gets the updated employee object from servlet
      * @return boolean value
-     *//*
-
-    public boolean updateEmployee(Employee employee) {
+     */
+   @PostMapping(value = "/updateEmployee")
+    public String updateEmployee(@ModelAttribute("employee") Employee employee, Model model) {
         DateTimeUtils dateTimeUtils = new DateTimeUtils();
         employee.setModifiedAt(dateTimeUtils.getDate());
-        return employeeServiceImpl.updateEmployee(employee);
+        boolean employeeUpdated = employeeServiceImpl.updateEmployee(employee);
+        if(employeeUpdated)
+            model.addAttribute("status","Employee Updated");
+        else
+            model.addAttribute("status","Employee Not Updated");
+        return "performEmployeeUpdate";
     }
 
-    *//**
+    @RequestMapping(value = "/performDeleteEmployee")
+    public String deleteEmployee() {
+        return "performDeleteEmployee";
+    }
+
+    /**
      * Gets the employee id from the servlet which the user
      * wants to remove from the database
      * @return int value
-     *//*
-    public int deleteEmployee(String employeeId) {
-        return employeeServiceImpl.removeEmployee(employeeId);
+     */
+    @GetMapping(value="/deleteEmployee")
+    public String deleteEmployee(@RequestParam String employeeId, Model model) {
+        int deleted = employeeServiceImpl.removeEmployee(employeeId);
+        if (deleted == 1) {
+            model.addAttribute("status", "Employee deleted successfully");
+        } else {
+            model.addAttribute("status", "Employee Not deleted");
+        }
+        return "performDeleteEmployee";
     }
 
-    *//**
+    /**
      * Gets the leave records from the servlet
      * @param leaveRecord get leaveRecord object from leave record servlet
      * @param employee get employee object from employee servlet

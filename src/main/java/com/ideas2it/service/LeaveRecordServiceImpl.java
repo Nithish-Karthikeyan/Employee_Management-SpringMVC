@@ -1,7 +1,6 @@
 package com.ideas2it.service;
 
 import com.ideas2it.dao.LeaveRecordDao;
-import com.ideas2it.dao.LeaveRecordDaoImpl;
 import com.ideas2it.model.LeaveRecord;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,10 @@ import java.util.List;
 @Service
 public class LeaveRecordServiceImpl implements LeaveRecordService {
 
-    private final LeaveRecordDao leaveRecordDaoImpl = new LeaveRecordDaoImpl();
+    private final LeaveRecordDao leaveRecordDaoImpl;
+    public LeaveRecordServiceImpl(LeaveRecordDao leaveRecordDaoImpl) {
+        this.leaveRecordDaoImpl = leaveRecordDaoImpl;
+    }
 
     @Override 
     public int addLeaveRecord(LeaveRecord leaveRecord) {
