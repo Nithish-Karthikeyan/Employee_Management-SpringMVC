@@ -9,10 +9,11 @@
 
 <body>
 <h1>Leave Records</h1><br>
-<a href = "performGetEmployeeForLeave.jsp">Add Leave Record</a><br><br>
-<a href = "performEditLeaveRecord.jsp">Update Leave Record</a><br><br>
-<a href = "performGetLeaveRecord.jsp">Show Leave Records</a><br><br>
-<a href = "performDeleteLeaveRecord.jsp">Delete Leave Record</a><br><br>
-<a href = "index.jsp">Back to Main Menu</a>
+<h3>${message}</h3>
+<a href = "${pageContext.request.contextPath}/performGetEmployeeForLeave">Add Leave Record</a><br><br>
+<a href = "${pageContext.request.contextPath}/performEditLeaveRecord">Update Leave Record</a><br><br>
+<a href = "${pageContext.request.contextPath}/performGetLeaveRecord">Show Leave Records</a><br><br>
+<a href = "${pageContext.request.contextPath}/performDeleteLeaveRecord">Delete Leave Record</a><br><br>
+<a href = "${pageContext.request.contextPath}/index">Back to Main Menu</a>
 </body>
 </html>

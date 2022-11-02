@@ -18,24 +18,7 @@ public class LeaveRecord {
     private String modifiedAt;
     private int deleted;
     private Employee employee;
-
     public LeaveRecord() {}
-    
-    public LeaveRecord(Employee employee, String fromDate, String toDate, String leaveType, String createdAt, String modifiedAt) {
-        this.employee = employee;
-        this.fromDate = fromDate;
-        this.toDate = toDate;
-        this.leaveType = leaveType;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt; 
-    }
-
-    public LeaveRecord(String fromDate, String toDate, String leaveType) {
-        this.fromDate = fromDate;
-        this.toDate  = toDate;
-        this.leaveType = leaveType;
-    }
-
     public void setEmployee(Employee employee) {
         this.employee = employee;
     }

@@ -43,7 +43,7 @@ public class LeaveRecordDaoImpl implements LeaveRecordDao {
         Session session = sessionFactory.openSession();
         List<LeaveRecord> leaveRecords = new ArrayList<>();
         try {
-            Query query = session.createQuery("FROM LeaveRecord WHERE deleted = 0 AND employee_id = :employeeId");
+            Query query = session.createQuery("FROM LeaveRecord WHERE deleted = 0 AND employee.employeeId = :employeeId");
             query.setParameter("employeeId",employeeId);
             leaveRecords = query.getResultList();
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public class LeaveRecordDaoImpl implements LeaveRecordDao {
         int updatedRow = 0;
         try {
             Transaction transaction = session.beginTransaction();
-            Query query = session.createQuery("UPDATE LeaveRecord SET deleted = 1 WHERE employee_id = :employeeId");
+            Query query = session.createQuery("UPDATE LeaveRecord SET deleted = 1 WHERE employee.employeeId = :employeeId");
             query.setParameter("employeeId",employeeId);
             updatedRow = query.executeUpdate();
             transaction.commit();

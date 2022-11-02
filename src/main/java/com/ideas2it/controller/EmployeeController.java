@@ -2,6 +2,7 @@ package com.ideas2it.controller;
 
 import com.ideas2it.model.Employee;
 import com.ideas2it.datetimeutils.DateTimeUtils;
+import com.ideas2it.model.LeaveRecord;
 import com.ideas2it.service.*;
 
 import jakarta.persistence.NoResultException;
@@ -9,6 +10,8 @@ import org.hibernate.HibernateException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * This class gets input from the servlet and pass the employee details
@@ -40,11 +43,6 @@ public class EmployeeController {
         return "employee";
     }
 
-    @RequestMapping(value = "/leaveRecords")
-    public String leaveRecords() {
-        return "leaveRecords";
-    }
-
     @RequestMapping(value = "/projects")
     public String projects() {
         return "projects";
@@ -64,7 +62,6 @@ public class EmployeeController {
     public String createEmployee(Model model) {
         model.addAttribute("employee",new Employee());
         return "performAddEmployee";
-
     }
 
     /**
@@ -103,8 +100,14 @@ public class EmployeeController {
      */
     @GetMapping("/readEmployee")
     public String printEmployees(Model model) {
-        model.addAttribute("employeeList",employeeServiceImpl.getEmployees());
-        return "performReadAllEmployees";
+        List<Employee> employeeList = employeeServiceImpl.getEmployees();
+        if(null != employeeList) {
+            model.addAttribute("employeeList", employeeList);
+            return "performReadAllEmployees";
+        } else {
+            model.addAttribute("message","No Employees in the database");
+        }
+        return "employee";
     }
 
     @RequestMapping(value = "/performReadEmployeeById")
@@ -133,13 +136,14 @@ public class EmployeeController {
 
     @RequestMapping(value = "/getEmployee")
     public String getEmployeeForUpdate(@RequestParam String employeeId, Model model) {
-        Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
-        if(null != employee) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
             model.addAttribute("employee",employee);
-        } else {
-            model.addAttribute("status","Employee Not Found");
+            return "performEmployeeUpdate";
+        } catch(NoResultException e){
+            model.addAttribute("message","Employee Not Found");
+            return "leaveRecords";
         }
-        return "performEmployeeUpdate";
     }
 
    /**
@@ -181,33 +185,63 @@ public class EmployeeController {
         return "performDeleteEmployee";
     }
 
+    @RequestMapping(value = "/leaveRecords")
+    public String leaveRecords() {
+        return "leaveRecords";
+    }
+
+    @RequestMapping(value = "/performGetEmployeeForLeave")
+    public String getEmployeeForLeave() {
+        return "performGetEmployeeForLeave";
+    }
+
+    @RequestMapping(value = "/getEmployeeForLeave")
+    public String createLeaveForEmployee(@RequestParam("employeeId") String employeeId, Model model) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            model.addAttribute("leaveRecord",new LeaveRecord());
+            model.addAttribute("employee", employee);
+            return "performAddLeaveRecord";
+        } catch(NoResultException e) {
+            model.addAttribute("message", "Employee Not Found");
+        }
+        return "leaveRecords";
+    }
+
     /**
      * Gets the leave records from the servlet
      * @param leaveRecord get leaveRecord object from leave record servlet
-     * @param employee get employee object from employee servlet
+     * @param leaveRecord get employee object from employee servlet
      * @return int
-     *//*
-    public int addLeaveRecord(LeaveRecord leaveRecord, Employee employee) {
+     */
+    @PostMapping(value = "/addLeaveRecord")
+    public String addLeaveRecord(@ModelAttribute("leaveRecord") LeaveRecord leaveRecord, @RequestParam("employeeId") String employeeId, Model model) {
         DateTimeUtils dateTimeUtils = new DateTimeUtils();
+        String status;
         int leaveId;
-        String fromDate = leaveRecord.getFromDate();
-        String toDate = leaveRecord.getToDate();
-        String leaveType = leaveRecord.getLeaveType();
-        String createdAt = dateTimeUtils.getDate();
-        String modifiedAt = dateTimeUtils.getDate();
-        boolean isValidDate = dateTimeUtils.validateLeaveDate(fromDate, toDate);
+        Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+        leaveRecord.setEmployee(employee);
+        leaveRecord.setCreatedAt(dateTimeUtils.getDate());
+        leaveRecord.setModifiedAt(dateTimeUtils.getDate());
 
+        boolean isValidDate = dateTimeUtils.validateLeaveDate(leaveRecord.getFromDate(), leaveRecord.getToDate());
         if(isValidDate) {
-            leaveRecord = new LeaveRecord(employee, fromDate, toDate, leaveType,
-                    createdAt, modifiedAt);
             leaveId = leaveRecordServiceImpl.addLeaveRecord(leaveRecord);
+            if (leaveId != 0) {
+                status = "Leave Record Created";
+                model.addAttribute("status", status);
+            } else {
+                status = "Leave Record Not created";
+                model.addAttribute("status", status);
+            }
         } else {
-            leaveId = 0;
+            status = "Invalid From and To dates";
+            model.addAttribute("status", status);
         }
-        return leaveId;
+        return "performAddLeaveRecord";
     }
 
-    *//**
+    /**
      * Get the number of leaves taken by the employee
      * It gets leaves of employee by employee id
      *//*
@@ -229,25 +263,61 @@ public class EmployeeController {
             }
         }
         return MAX_LEAVES - leaveCount;
+    }*/
+
+    @RequestMapping(value="/performGetLeaveRecord")
+    public String readLeaveRecords() {
+        return "performGetLeaveRecord";
     }
 
-    *//**
+    /**
      * Get the leave records of the employees
-     *//*
-    public List<LeaveRecord> printLeaveRecords() {
-        return leaveRecordServiceImpl.getLeaveRecords();
+     */
+    @GetMapping(value="/readLeaveRecord")
+    public String printLeaveRecords(Model model) {
+        List<LeaveRecord> leaveRecords = leaveRecordServiceImpl.getLeaveRecords();
+        if(null != leaveRecords) {
+            model.addAttribute("leaveRecords", leaveRecords);
+            return "performReadLeaveRecords";
+        } else {
+            model.addAttribute("message","No Leave Records in the database");
+        }
+        return "leaveRecords";
     }
 
-    *//**
+    @RequestMapping(value="/performLeaveRecordEmployeeById")
+    public String readLeaveRecordsByEmployeeId() {
+        return "performLeaveRecordEmployeeById";
+    }
+
+    /**
      * Get leave Record by employee-Id
      * @param employeeId Gets the employeeId as an input
      * @return List of leave records
-     *//*
-    public List<LeaveRecord> getLeaveRecordByEmployeeId(String employeeId) {
-        return leaveRecordServiceImpl.getLeaveRecordByEmployeeId(employeeId);
+     */
+    @GetMapping(value = "/readLeaveRecordByEmployeeId")
+    public String getLeaveRecordByEmployeeId(@RequestParam("employeeId") String employeeId, Model model) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            if (null != employee) {
+                List<LeaveRecord> leaveRecords = leaveRecordServiceImpl.getLeaveRecordByEmployeeId(employeeId);
+                System.out.println(leaveRecords);
+                if(!leaveRecords.isEmpty()) {
+                    model.addAttribute("leaveRecords", leaveRecords);
+                    return "performReadLeaveRecords";
+                } else {
+                    model.addAttribute("message","No Leaves taken by the employee");
+                    return "leaveRecords";
+                }
+            } else {
+                model.addAttribute("message","No leave records in the database");}
+        } catch(NoResultException e) {
+            model.addAttribute("message","Employee Not Found");
+        }
+        return "leaveRecords";
     }
 
-    *//**
+/*    /**
      * Gets the leave record by using leave ID for update leave Record
      * @param leaveId Gets the leaveID from the servlet
      * @param employeeId Gets employeeID from the servlet
@@ -263,9 +333,13 @@ public class EmployeeController {
             }
         }
         return leaveRecord;
-    }
+    }*/
 
-    *//**
+    @RequestMapping(value = "/performUpdateEmployee")
+    public String updateEmployee() {
+        return "performUpdateEmployee";
+    }
+    /**
      * Request the update employee leave record method in employee leave record service 
      * to update the leave record
      *
@@ -278,16 +352,36 @@ public class EmployeeController {
         return leaveRecordServiceImpl.updateLeaveRecord(leaveRecord);
     }
 
-    *//**
+    */
+    @RequestMapping(value="/performDeleteLeaveRecord")
+    public String removeLeaveRecord(){
+        return "performDeleteLeaveRecord";
+    }
+    /**
      * Gets the employee id from the servlet
      * to remove the leave record the database
      * @param employeeId gets employeeId from the servlet
      * @return int
-     *//*
-    public int deleteLeaveRecord(String employeeId) {
-        return leaveRecordServiceImpl.removeLeaveRecord(employeeId);
+     */
+    @GetMapping(value = "/deleteLeaveRecord")
+    public String deleteLeaveRecord(@RequestParam String employeeId, Model model) {
+        String message;
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            int updatedRow = leaveRecordServiceImpl.removeLeaveRecord(employeeId);
+            if(updatedRow != 0) {
+                message = "Leave Record deleted Successfully";
+                model.addAttribute("message", message);
+            } else {
+                message = "Leave Record Not deleted";
+                model.addAttribute("message", message);
+            }
+        } catch(NoResultException e) {
+            model.addAttribute("message","Employee Not Found");
+        }
+        return "leaveRecords";
     }
-*//*------------------------Employee Project*----------------------------*//*
+/*------------------------Employee Project*----------------------------*//*
 
     *//**
      * Gets the employee project from the employee project servlet

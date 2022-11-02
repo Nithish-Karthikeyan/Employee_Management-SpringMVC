@@ -9,7 +9,7 @@
 <h2>Leave Records</h2>
 <form action ="readLeaveRecord" method="get">
     <a href ="${pageContext.request.contextPath}/readLeaveRecord">Get All Leave Records</a><br><br>
-    <a href ="performLeaveRecordEmployeeById.jsp">Get Leave Records of an Employee</a><br><br>
+    <a href ="${pageContext.request.contextPath}/performLeaveRecordEmployeeById">Get Leave Records of an Employee</a><br><br>
     <h4>${leaveRecords}</h4>
     <a href ="leaveRecords.jsp">Back to Menu</a>
 </form>

@@ -27,31 +27,6 @@ public class Employee {
     
     public Employee () {}
 
-    public Employee (String employeeId, String employeeType, String employeeName, String dateOfBirth, String employeeGender, 
-                     String mobileNumber, String emailId, String designation, String createdAt, String modifiedAt) {
-        this.employeeId = employeeId;
-        this.employeeType = employeeType;
-        this.employeeName = employeeName;
-        this.employeeGender = employeeGender;
-        this.dateOfBirth = dateOfBirth;
-        this.mobileNumber = mobileNumber;
-        this.emailId = emailId; 
-        this.designation = designation;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
-    }
-
-    public Employee(String employeeName, String employeeType, String employeeGender, String dateOfBirth, String mobileNumber, String emailId, String designation) {
-        this.employeeName = employeeName;
-        this.employeeType = employeeType;
-        this.employeeGender = employeeGender;
-        this.dateOfBirth = dateOfBirth;
-        this.mobileNumber = mobileNumber;
-        this.emailId = emailId;
-        this.designation = designation;
-    }
-
-
     public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
     }

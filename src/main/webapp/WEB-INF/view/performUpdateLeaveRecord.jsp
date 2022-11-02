@@ -1,4 +1,3 @@
-<%@ page import="com.ideas2it.model.LeaveRecord" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
@@ -10,28 +9,25 @@
         <h2>Update Leave Record</h2><br>
         <h3>Fill the details</h3><br>
 
-        <form action = "updateLeaveRecord" method = "post">
-            <%LeaveRecord leaveRecord = (LeaveRecord) request.getAttribute("leaveRecord");
-            if (leaveRecord != null) {%>
-            <input type="hidden" name="employeeId" value="${employee}">
+        <form:form action = "updateLeaveRecord" method = "post">
+            <form:input type="hidden" path="employee" value="${leaveRecord.employee}"/>
 
-            <input type ="text" name ="leaveId" value = "<%=leaveRecord.getLeaveId()%>" readonly><br>
-            <label for="fromDate">From Date</label><br>
-            <input type="date" id="fromDate" name="fromDate" required = "required" value = "<%=leaveRecord.getFromDate()%>"><br><br>
+            <form:input type ="text" path ="leaveId" value = "${leaveRecord.leaveId}" readonly="true" /><br>
+            <form:label path="fromDate">From Date</form:label><br>
+            <form:input type="date" path="fromDate" required = "required" value = "${leaveRecord.fromDate}"/><br><br>
 
-            <label for="toDate">TO Date</label><br>
-            <input type="date" id="toDate" name="toDate" required = "required" value = "<%=leaveRecord.getToDate()%>"><br><br>
+            <form:label path="toDate">TO Date</form:label><br>
+            <form:input type="date" path="toDate" required = "required" value = "${leaveRecord.toDate}"/><br><br>
 
-            <label for="leaveType" required = "required">Leave Type</label><br>
-            <select name="leaveType" id="leaveType" value = "<%=leaveRecord.getLeaveType()%>">
+            <form:label path="leaveType" required = "required">Leave Type</form:label><br>
+            <form:select path="leaveType" value = "${leaveRecord.leaveType}">
                 <option value="Casual Leave">Casual Leave</option>
                 <option value="Medical Leave">Medical Leave</option>
                 <option value="Sick Leave">Sick Leave</option>
-            </select><br><br>
+            </form:select><br><br>
 
             <input type = "submit" value = "Submit">
-        </form>
-        <%}%>
+        </form:form>
         <h3>${status}</h3><br><br>
         <a href = "leaveRecords.jsp">Back to Menu</a>
     </body>

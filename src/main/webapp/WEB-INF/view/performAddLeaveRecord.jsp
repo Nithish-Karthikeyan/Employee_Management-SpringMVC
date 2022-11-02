@@ -1,4 +1,3 @@
-<%@ page import="com.ideas2it.model.Employee" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
@@ -10,30 +9,28 @@
 <h2>Add Leave Record</h2><br>
 <h3>Fill the details</h3><br>
 
-<%Employee employee = (Employee) request.getAttribute("employee");%>
-<%if (employee != null) {%>
-<form action = "addLeaveRecord" method = "post">
-    <p>Remaining leaves: ${leavesCount}</p>
-    <label for = "employeeId">Employee ID :</label>
-    <input type= "text" id="employeeId" name="employeeId" value ="<%=employee.getEmployeeId()%>" readonly="readonly" ><br><br>
+<form:form action = "addLeaveRecord" method = "post" modelAttribute="leaveRecord">
+    <p>Remaining leaves: </p>
+    <p>Employee ID:</p>
+    <form:input path="employeeId" name="employeeId" value="${employee.employeeId}" readonly="true"/><br><br>
 
-    <label for="fromDate">From Date:</label><br>
-    <input type="date" id="fromDate" name="fromDate" required = "required"><br><br>
+    <form:label path="fromDate">From Date:</form:label><br>
+    <form:input type="date" path="fromDate" required = "required"/><br><br>
 
-    <label for="toDate">To Date:</label><br>
-    <input type="date" id="toDate" name="toDate" required = "required"><br><br>
+    <form:label path="toDate">To Date:</form:label><br>
+    <form:input type="date" path="toDate" required = "required"/><br><br>
 
-    <label for="leaveType" required = "required">Leave Type</label><br>
-    <select name="leaveType" id="leaveType">
+    <form:label path="leaveType" required = "required">Leave Type</form:label><br>
+    <form:select path="leaveType" id="leaveType">
         <option value="Casual Leave">Casual Leave</option>
         <option value="Medical Leave">Medical Leave</option>
         <option value="Sick Leave">Sick Leave</option>
-    </select><br><br>
+    </form:select><br><br>
 
     <input type = "submit" value = "Submit">
-</form>
+
+</form:form>
 <h3>${status}</h3><br><br>
-<%}%>
 <a href = "performGetEmployeeForLeave.jsp">Back to Menu</a>
 </body>
 </html>
