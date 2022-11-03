@@ -2,6 +2,7 @@ package com.ideas2it.controller;
 
 import com.ideas2it.model.Employee;
 import com.ideas2it.datetimeutils.DateTimeUtils;
+import com.ideas2it.model.EmployeeProject;
 import com.ideas2it.model.LeaveRecord;
 import com.ideas2it.service.*;
 
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,11 +44,6 @@ public class EmployeeController {
     @RequestMapping(value = "/employee")
     public String employee() {
         return "employee";
-    }
-
-    @RequestMapping(value = "/projects")
-    public String projects() {
-        return "projects";
     }
 
     @RequestMapping(value = "/getEmployeeForProject")
@@ -199,6 +197,7 @@ public class EmployeeController {
     public String createLeaveForEmployee(@RequestParam("employeeId") String employeeId, Model model) {
         try {
             Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            model.addAttribute("leaveCount",getEmployeeLeaveCount(employeeId));
             model.addAttribute("leaveRecord",new LeaveRecord());
             model.addAttribute("employee", employee);
             return "performAddLeaveRecord";
@@ -211,7 +210,6 @@ public class EmployeeController {
     /**
      * Gets the leave records from the servlet
      * @param leaveRecord get leaveRecord object from leave record servlet
-     * @param leaveRecord get employee object from employee servlet
      * @return int
      */
     @PostMapping(value = "/addLeaveRecord")
@@ -244,7 +242,7 @@ public class EmployeeController {
     /**
      * Get the number of leaves taken by the employee
      * It gets leaves of employee by employee id
-     *//*
+     */
     public int getEmployeeLeaveCount(String employeeId) {
         final int MAX_LEAVES = 10;
         LocalDate firstDate;
@@ -252,18 +250,17 @@ public class EmployeeController {
         int leaveCount = 0;
         List<LeaveRecord> leaveRecords = leaveRecordServiceImpl.getLeaveRecordByEmployeeId(employeeId);
 
-        if (leaveRecords != null) {
+        if (!leaveRecords.isEmpty()) {
             DateTimeUtils dateTimeUtils = new DateTimeUtils();
             for (LeaveRecord leaveEntry : leaveRecords) {
                 firstDate = dateTimeUtils.getLocalDateFormat(leaveEntry.getFromDate());
                 secondDate = dateTimeUtils.getLocalDateFormat(leaveEntry.getToDate());
                 int count = dateTimeUtils.findLeaveCount(firstDate, secondDate);
-                System.out.println(count);
                 leaveCount += count;
             }
         }
         return MAX_LEAVES - leaveCount;
-    }*/
+    }
 
     @RequestMapping(value="/performGetLeaveRecord")
     public String readLeaveRecords() {
@@ -301,7 +298,6 @@ public class EmployeeController {
             Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
             if (null != employee) {
                 List<LeaveRecord> leaveRecords = leaveRecordServiceImpl.getLeaveRecordByEmployeeId(employeeId);
-                System.out.println(leaveRecords);
                 if(!leaveRecords.isEmpty()) {
                     model.addAttribute("leaveRecords", leaveRecords);
                     return "performReadLeaveRecords";
@@ -317,42 +313,66 @@ public class EmployeeController {
         return "leaveRecords";
     }
 
-/*    /**
+    @RequestMapping(value = "/performEditLeaveRecord")
+    public String editLeaveRecord() {
+        return "performEditLeaveRecord";
+    }
+
+    @GetMapping(value = "/getEmployeeForUpdate")
+    public String getEmployeeForLeaveUpdate(@RequestParam("employeeId") String employeeId, Model model) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            if (null != employee) {
+                List<LeaveRecord> leaveRecords = leaveRecordServiceImpl.getLeaveRecordByEmployeeId(employeeId);
+                if (!leaveRecords.isEmpty()) {
+                    model.addAttribute("employee", employee);
+                    model.addAttribute("leaveRecords", leaveRecords);
+                    return "performGetLeaveId";
+                } else {
+                    model.addAttribute("message", "No Leaves taken by the employee");
+                }
+            }
+        } catch(NoResultException e) {
+            model.addAttribute("message", "Employee Not Found");
+        }
+        return "leaveRecords";
+    }
+
+    /**
      * Gets the leave record by using leave ID for update leave Record
      * @param leaveId Gets the leaveID from the servlet
      * @param employeeId Gets employeeID from the servlet
      * @return leave record
-     *//*
-    public LeaveRecord getLeaveRecord(int leaveId, String employeeId) {
-        LeaveRecord leaveRecord = null;
-        List<LeaveRecord> leaveRecords = getLeaveRecordByEmployeeId(employeeId);
-
+     */
+    @GetMapping(value = "/getLeaveId")
+    public String getLeaveRecord(@RequestParam("leaveId") int leaveId, @RequestParam("employeeId") String employeeId, Model model) {
+        List<LeaveRecord> leaveRecords = leaveRecordServiceImpl.getLeaveRecordByEmployeeId(employeeId);
         for (LeaveRecord leaveEntry: leaveRecords) {
             if (leaveEntry.getLeaveId() == leaveId) {
-                leaveRecord = leaveEntry;
+                model.addAttribute("leaveRecord",leaveEntry);
             }
         }
-        return leaveRecord;
-    }*/
-
-    @RequestMapping(value = "/performUpdateEmployee")
-    public String updateEmployee() {
-        return "performUpdateEmployee";
+        return "performUpdateLeaveRecord";
     }
+
     /**
      * Request the update employee leave record method in employee leave record service 
      * to update the leave record
      *
      * @param leaveRecord gets updated leave record object from the servlet
      * @return boolean
-     *//*
-    public boolean updateLeaveRecord(LeaveRecord leaveRecord) {
+     */
+    @PostMapping(value = "/updateLeaveRecord")
+    public String updateLeaveRecord(@ModelAttribute("leaveRecord") LeaveRecord leaveRecord, Model model) {
         DateTimeUtils dateTimeUtils = new DateTimeUtils();
         leaveRecord.setModifiedAt(dateTimeUtils.getDate());
-        return leaveRecordServiceImpl.updateLeaveRecord(leaveRecord);
+        if (leaveRecordServiceImpl.updateLeaveRecord(leaveRecord))
+            model.addAttribute("message","Leave Record Updated");
+        else
+            model.addAttribute("message","Leave Record Not Updated");
+        return "leaveRecords";
     }
 
-    */
     @RequestMapping(value="/performDeleteLeaveRecord")
     public String removeLeaveRecord(){
         return "performDeleteLeaveRecord";
@@ -381,88 +401,200 @@ public class EmployeeController {
         }
         return "leaveRecords";
     }
-/*------------------------Employee Project*----------------------------*//*
+/*------------------------Employee Project*----------------------------*/
 
-    *//**
+    @RequestMapping(value = "/projects")
+    public String projects() {
+        return "projects";
+    }
+
+    @RequestMapping(value = "/performGetEmployeeForProject")
+    public String navigateToEmployeeForProject() {
+        return "performGetEmployeeForProject";
+    }
+
+    @GetMapping(value = "/getEmployeeForProject")
+    public String getEmployeeForProject(@RequestParam("employeeId") String employeeId, Model model) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            model.addAttribute("employee",employee);
+            return "performGetProjectManager";
+        } catch(NoResultException e) {
+            model.addAttribute("message", "Employee Not Found");
+        }
+        return "projects";
+    }
+
+    @RequestMapping(value = "/getProjectManager")
+    public String getProjectManagerForProject(@ModelAttribute("employee") Employee employee, @RequestParam("projectManagerId") String projectManagerId, Model model) {
+        try {
+            System.out.println(employee);
+            Employee projectManager = employeeServiceImpl.getEmployeeById(projectManagerId);
+            model.addAttribute("projectManager",projectManager);
+            model.addAttribute("employee",employee);
+            model.addAttribute("project",new EmployeeProject());
+            return "performAddProject";
+        } catch(NoResultException e) {
+            model.addAttribute("message", "Employee Not Found");
+        }
+        return "projects";
+    }
+
+    /**
      * Gets the employee project from the employee project servlet
      * @param project getting project object from the servlet
      * @return int
-     *//*
-    public int addEmployeeProject(EmployeeProject project,Employee employee) {
+     */
+    @PostMapping(value = "/addProject")
+    public String addEmployeeProject(@ModelAttribute("project") EmployeeProject project, @RequestParam("employeeId") String employeeId, Model model) {
         DateTimeUtils dateTimeUtils = new DateTimeUtils();
         List<Employee> employees = new ArrayList<>();
-        employees.add(employee);
-        String projectManagerName = project.getProjectManagerName();
-        String projectName = project.getProjectName();
-        String clientName = project.getClientName();
-        String startDate = project.getStartDate();
-        String createdAt = dateTimeUtils.getDate();
-        String modifiedAt = dateTimeUtils.getDate();
-        EmployeeProject employeeProject = new EmployeeProject(projectName,
-                                                              projectManagerName,
-                                                              clientName,
-                                                              startDate,
-                                                              createdAt,
-                                                              modifiedAt);
+        employees.add(employeeServiceImpl.getEmployeeById(employeeId));
+        project.setCreatedAt(dateTimeUtils.getDate());
+        project.setModifiedAt(dateTimeUtils.getDate());
+        project.setEmployees(employees);
+        int projectId =  employeeProjectServiceImpl.addEmployeeProject(project);
 
-        employeeProject.setEmployees(employees);
-        return employeeProjectServiceImpl.addEmployeeProject(employeeProject);
+        if(projectId != 0)
+            model.addAttribute("message","Project created Successfully");
+        else
+            model.addAttribute("message","Project not created");
+        return "projects";
     }
 
-    *//**
+    @RequestMapping(value = "/performGetProject")
+    public String getProjects() {
+        return "performGetProject";
+    }
+
+
+    /**
      * Get List of employee projects of the employees
      * @return List of Employee Project
-     *//*
-    public List<EmployeeProject> printEmployeeProjects() {
-        return employeeProjectServiceImpl.getEmployeeProjects();
+     */
+    @RequestMapping(value = "/getProjects")
+    public String printEmployeeProjects(Model model) {
+        List<EmployeeProject> projects = employeeProjectServiceImpl.getEmployeeProjects();
+        if(null != projects) {
+            model.addAttribute("projects", projects);
+            return "performGetProjects";
+        } else {
+            model.addAttribute("message","No Projects in the database");
+        }
+        return "projects";
     }
 
-    *//**
+    @RequestMapping(value = "/performGetProjectByEmployeeId")
+    public String getProjectByEmployeeID() {
+        return "performGetProjectByEmployeeId";
+    }
+
+    /**
      * Get Employee Project by using employee_Id
      * @param employeeId Get employeeId from the servlet
      * @return List of Employee project
-     *//*
-    public List<EmployeeProject> getEmployeeProjectByEmployeeId(String employeeId) {
-        return employeeProjectServiceImpl.getEmployeeProjectByEmployeeId(employeeId);
+     */
+    @GetMapping(value="/getProjectsByEmployeeId")
+    public String getEmployeeProjectByEmployeeId(@RequestParam("employeeId") String employeeId, Model model) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            List<EmployeeProject> projects = employeeProjectServiceImpl.getEmployeeProjectByEmployeeId(employeeId);
+            if (!projects.isEmpty()) {
+                model.addAttribute("projects", projects);
+                return "performGetProjects";
+            } else {
+                model.addAttribute("message", "Employee is not assigned to project");
+            }
+        } catch(NoResultException e) {
+            model.addAttribute("message","Employee Not found");
+        }
+        return "projects";
     }
 
-    *//**
-     * Request the update employee project method in employee project service 
-     * to update the project details
-     *
-     * @param employeeProject Get updated employee project object from the servlet
-     * @return boolean
-     *//*
-    public boolean updateEmployeeProject(EmployeeProject employeeProject) {
-        DateTimeUtils dateTimeUtils = new DateTimeUtils();
-        employeeProject.setModifiedAt(dateTimeUtils.getDate());
-        return employeeProjectServiceImpl.updateEmployeeProject(employeeProject);
+    @RequestMapping(value = "/performGetProjectId")
+    public String getEmployeeForProjectUpdate() {
+        return "performGetProjectId";
     }
 
-    *//**
+    /**
      * Get the employee project using project ID
      * @param projectId Get the project ID from the servlet
      * @return Employee project
-     *//*
-    public EmployeeProject getProjectById(int projectId) {
-        EmployeeProject project = null;
+     */
+    @GetMapping("/getProjectId")
+    public String getProjectById(@RequestParam("projectId") int projectId, Model model) {
         List<EmployeeProject> projects = employeeProjectServiceImpl.getEmployeeProjects();
 
         for(EmployeeProject projectById : projects) {
             if(projectId == projectById.getProjectId()) {
-                project = projectById;
+                model.addAttribute("project",projectById);
+                return "performUpdateProject";
             }
         }
-        return project;
+        model.addAttribute("message","Invalid Project Id");
+        return "projects";
     }
 
-    *//**
-     * Assign the employee for the project
-     * @param employee get employee object from the employee servlet
-     * @param project get project object from the employeeProject servlet
+    /**
+     * Request the update employee project method in employee project service 
+     * to update the project details
+     *
+     * @param project Get updated employee project object from the servlet
      * @return boolean
-     *//*
-   public boolean assignProject(Employee employee, EmployeeProject project) {
-       return employeeServiceImpl.assignProject(employee, project);
-    }*/
+     */
+    @PostMapping(value = "/updateProject")
+    public String updateEmployeeProject(@ModelAttribute EmployeeProject project,Model model) {
+        DateTimeUtils dateTimeUtils = new DateTimeUtils();
+        project.setModifiedAt(dateTimeUtils.getDate());
+        if(employeeProjectServiceImpl.updateEmployeeProject(project))
+            model.addAttribute("message","Project Updated Successfully");
+        else
+            model.addAttribute("message","Project not updated");
+        return "projects";
+    }
+
+    @RequestMapping(value="/performGetEmployeeForProjectAssign")
+    public String navigateToGetEmployee() {
+        return "performGetEmployeeForProjectAssign";
+    }
+    @GetMapping(value = "/getEmployeeForAssignProject")
+    public String getEmployeeForAssignToProject(@RequestParam("employeeId") String employeeId, Model model) {
+        try {
+            Employee employee = employeeServiceImpl.getEmployeeById(employeeId);
+            List<EmployeeProject> projects = employeeProjectServiceImpl.getEmployeeProjects();
+            if (null != projects ) {
+                model.addAttribute("employee", employee);
+                model.addAttribute("projects", projects);
+                return "performAssignEmployee";
+            } else {
+                model.addAttribute("message","No projects found");
+            }
+        } catch (NoResultException e) {
+            model.addAttribute("employee", "Employee Not Found");
+        }
+        return "projects";
+    }
+
+    /**
+     * Assign the employee for the project
+     * @param employeeId get employee object from the employee servlet
+     * @param projectId get project object from the employeeProject servlet
+     * @return boolean
+     */
+    @PostMapping(value="/assignEmployee")
+    public String assignProject(@RequestParam("employeeId") String employeeId, @RequestParam("projectId") String projectId, Model model) {
+        System.out.println(employeeId);
+        List<EmployeeProject> projects = employeeProjectServiceImpl.getEmployeeProjects();
+        for(EmployeeProject project : projects) {
+            if(Integer.parseInt(projectId) == project.getProjectId()) {
+                if(employeeServiceImpl.assignProject(employeeServiceImpl.getEmployeeById(employeeId), project))
+                    model.addAttribute("message","Employee successfully assigned to the project");
+                else
+                    model.addAttribute("message","Employee Not Assigned");
+            } else {
+                model.addAttribute("message","Project Not Found");
+            }
+        }
+        return "projects";
+    }
 }

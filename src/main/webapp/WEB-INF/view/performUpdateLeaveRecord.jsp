@@ -9,9 +9,8 @@
         <h2>Update Leave Record</h2><br>
         <h3>Fill the details</h3><br>
 
-        <form:form action = "updateLeaveRecord" method = "post">
-            <form:input type="hidden" path="employee" value="${leaveRecord.employee}"/>
-
+        <form:form action = "updateLeaveRecord" method = "post" modelAttribute="leaveRecord">
+            <input type="hidden" name = "createdAt" value="${leaveRecord.createdAt}"/>
             <form:input type ="text" path ="leaveId" value = "${leaveRecord.leaveId}" readonly="true" /><br>
             <form:label path="fromDate">From Date</form:label><br>
             <form:input type="date" path="fromDate" required = "required" value = "${leaveRecord.fromDate}"/><br><br>
@@ -28,7 +27,6 @@
 
             <input type = "submit" value = "Submit">
         </form:form>
-        <h3>${status}</h3><br><br>
         <a href = "leaveRecords.jsp">Back to Menu</a>
     </body>
 </html>

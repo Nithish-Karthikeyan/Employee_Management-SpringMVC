@@ -10,6 +10,7 @@
 
     <body>
         <h1>Employee Details</h1><br>
+        <h3>${message}</h3>
         <a href = "${pageContext.request.contextPath}/performAddEmployee">Add employee</a><br><br>
         <a href = "${pageContext.request.contextPath}/performUpdateEmployee">Update employee</a><br><br>
         <a href = "${pageContext.request.contextPath}/performGetEmployee">Read employee</a><br><br>

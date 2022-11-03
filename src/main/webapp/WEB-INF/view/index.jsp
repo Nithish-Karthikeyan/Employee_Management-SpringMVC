@@ -11,6 +11,6 @@
         <a href = "${pageContext.request.contextPath}/employee">Employee Details</a><br><br>
         <a href = "${pageContext.request.contextPath}/leaveRecords">Leave Records</a><br><br>
         <a href = "${pageContext.request.contextPath}/projects">Project Details</a><br><br>
-        <a href = "${pageContext.request.contextPath}/getEmployeeForProject">Assign Employee</a><br><br>
+        <a href = "${pageContext.request.contextPath}/performGetEmployeeForProjectAssign">Assign Employee</a><br><br>
     </body>
 </html>

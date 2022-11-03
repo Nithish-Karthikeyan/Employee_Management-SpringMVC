@@ -1,5 +1,5 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -9,9 +9,10 @@
 
 <body>
 <h1>Projects Details</h1><br>
-<a href = "performGetEmployeeForProject.jsp">Add Project</a><br><br>
-<a href = "performGetEmployeeProject.jsp">Update Project</a><br><br>
-<a href = "performGetProject.jsp">Show Projects</a><br><br>
+<h2>${message}</h2>
+<a href = "${pageContext.request.contextPath}/performGetEmployeeForProject">Add Project</a><br><br>
+<a href = "${pageContext.request.contextPath}/performGetProjectId">Update Project</a><br><br>
+<a href = "${pageContext.request.contextPath}/performGetProject">Show Projects</a><br><br>
 <a href = "index.jsp">Back to Main Menu</a>
 </body>
 </html>

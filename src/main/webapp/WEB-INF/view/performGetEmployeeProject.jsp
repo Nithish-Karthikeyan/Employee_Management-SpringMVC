@@ -5,7 +5,7 @@
     <title>Project</title>
 </head>
 <body>
-<form action="getEmployeeForProjectUpdate" method="post">
+<form action="getEmployeeForProjectUpdate" method="get">
     <label for="employeeId">Enter the Employee ID:</label>
     <input type = "text" id = "employeeId" name = "employeeId"><br><br>
     <input type = "submit" value = "Submit">

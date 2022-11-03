@@ -10,10 +10,10 @@
 <h2>Project</h2><br>
 <h3>Fill the details</h3><br>
 
-<form action = "addProject" method = "post">
+<form:form action = "addProject" method = "post" modelAttribute = "project">
     
     <form:label path = "employeeId">Employee ID :</form:label>
-    <form:input type= "text" path="employeeId" value ="${employee.employeeId}" readonly="readonly" /><br><br>
+    <form:input type= "text" name="employeeId" path="employeeId" value ="${employee.employeeId}" readonly="true" /><br><br>
 
     <form:label path="projectManagerName">Project Manager Name:</form:label><br>
     <form:input type="text" path="projectManagerName" value="${projectManager.employeeName}" readonly = "readonly"/><br><br>
@@ -28,8 +28,7 @@
     <form:input type="date" path="startDate" required = "required"/><br><br>
 
     <input type = "submit" value = "Submit">
-</form>
-<h3>${status}</h3><br><br>
+</form:form>
 <a href = "projects.jsp">Back to Menu</a>
 </body>
 </html>

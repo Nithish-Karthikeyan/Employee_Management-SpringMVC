@@ -35,7 +35,7 @@ public class DateTimeUtils {
      * @return boolean
      */
     public boolean validateLeaveDate(String fromDate, String toDate) {
-        boolean isValidDate = false;
+        boolean isValidDate;
         LocalDate startDate = LocalDate.parse(fromDate);
         LocalDate endDate = LocalDate.parse(toDate);
         int difference = startDate.compareTo(endDate);
@@ -68,8 +68,12 @@ public class DateTimeUtils {
      */
     public int findLeaveCount(LocalDate  fromDate, LocalDate toDate) {
         int leaveCount = 0;
-        Period difference = Period.between(fromDate, toDate);
-        leaveCount = difference.getDays();
+        if (fromDate.isEqual(toDate)) {
+            leaveCount = 1;
+        } else {
+            Period difference = Period.between(fromDate, toDate);
+            leaveCount = difference.getDays();
+        }
         return leaveCount;
     }
 }

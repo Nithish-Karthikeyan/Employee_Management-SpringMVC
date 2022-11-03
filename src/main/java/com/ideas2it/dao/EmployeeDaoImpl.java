@@ -155,13 +155,12 @@ public class EmployeeDaoImpl implements EmployeeDao {
     @Override
     public boolean assignProject(Employee employee, EmployeeProject project) {
         Session session = sessionFactory.openSession();
-        boolean isAdded = false;    
+        boolean isAdded = false;
         List<EmployeeProject> projects = new ArrayList<>();
         projects.add(project);
-
+        employee.setEmployeeProjects(projects);
         try {
             Transaction transaction = session.beginTransaction();
-            employee.setEmployeeProjects(projects);
             session.saveOrUpdate(employee);
             transaction.commit();
             isAdded = true;

@@ -10,7 +10,7 @@
 <h3>Fill the details</h3><br>
 
 <form:form action = "addLeaveRecord" method = "post" modelAttribute="leaveRecord">
-    <p>Remaining leaves: </p>
+    <p>Remaining leaves: ${leaveCount} </p>
     <p>Employee ID:</p>
     <form:input path="employeeId" name="employeeId" value="${employee.employeeId}" readonly="true"/><br><br>
 

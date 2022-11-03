@@ -12,7 +12,6 @@
             <label for = "employeeId"></label>
             <input type = "text" id = "employeeId" name = "employeeId"/><br><br>
             <input type = "submit" value = "Submit"/>
-            <p>${notFound}</p>
         </form>
         <a href = "leaveRecords.jsp">Back to Main Menu</a><br><br>
     </body>

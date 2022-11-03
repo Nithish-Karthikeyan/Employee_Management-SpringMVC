@@ -11,7 +11,8 @@
             <h3>Fill the details</h3><br>
 
             <p>Employee ID :
-            <form:input path = "employeeId" value = "${employee.employeeId}" readonly = "readonly"/><br><br>
+            <input name = "employeeId" value = "${employee.employeeId}" readonly = "readonly"/>
+            <input type="hidden" name = "createdAt" value = "${employee.createdAt}"/><br><br>
 
             <form:label path = "employeeName">Name</form:label><br>
             <form:input type = "text" path = "employeeName" required = "required" minlength="3" maxlength="40" value = "${employee.employeeName}" pattern = "([a-zA-Z]{1,10}[\s.]?([a-zA-Z]{1,20}[\s.]?)+)"/><br><br>
